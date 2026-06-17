@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>温泉アイドル図鑑 ｜ 温泉と旅と、美しさをめぐる映像体験</title>
+<meta name="description" content="湯けむりの先に、まだ知らない物語。温泉旅番組 × 観光メディア × 推し活コンテンツ。会員制の映像体験プラットフォーム「温泉アイドル図鑑」。" />
+<style>
+  /* =========================================================
+     温泉アイドル図鑑 — TOP page design mock
+     和モダン × シネマティック / single-file, no external libs
+     ========================================================= */
+
+  :root{
+    /* 墨・濃紺ベース */
+    --sumi:        #0c0a09;   /* 最深部の墨 */
+    --ink:         #12100e;   /* 地の色 */
+    --ink-2:       #1a1714;   /* パネル */
+    --ink-3:       #221d18;   /* カード */
+    --konjo:       #131c26;   /* 濃紺の影 */
+    --cha:         #2a1d14;   /* 深い茶 */
+
+    /* 生成り・文字 */
+    --kinari:      #ece4d5;   /* 主要テキスト（生成り） */
+    --kinari-mute: #b6ab97;   /* 副次テキスト */
+    --kinari-dim:  #7d7464;   /* 最も控えめ */
+
+    /* 金系アクセント */
+    --gold:        #c8a86a;   /* 金 */
+    --gold-soft:   #d8c08c;
+    --gold-deep:   #9c7d44;
+    --shu:         #b14b3a;   /* 朱（差し色・最小限） */
+
+    --line:        rgba(200,168,106,.18);  /* 金の細線 */
+    --line-soft:   rgba(236,228,213,.08);
+
+    --maxw: 1320px;
+    --gut: clamp(20px, 5vw, 64px);
+
+    --serif: "Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --sans:  "Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic","Helvetica Neue",sans-serif;
+
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--sumi);
+    color:var(--kinari);
+    font-family:var(--sans);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+
+  /* 和紙風の極微細ノイズを全面に薄く敷く */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none; z-index:1;
+    opacity:.04; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  img{ display:block; max-width:100%; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+  ul{ list-style:none; }
+
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding-inline:var(--gut); }
+
+  /* 縦書き風の章番号・見出し補助 */
+  .eyebrow{
+    font-family:var(--serif);
+    font-size:12px; letter-spacing:.42em;
+    color:var(--gold);
+    text-transform:uppercase;
+    display:inline-flex; align-items:center; gap:14px;
+  }
+  .eyebrow::before{
+    content:""; width:34px; height:1px; background:var(--gold); opacity:.6;
+  }
+
+  .section-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:24px; margin-bottom:26px;
+  }
+  .section-head h2{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(22px,3vw,30px);
+    letter-spacing:.08em;
+    margin-top:12px;
+    line-height:1.3;
+  }
+  .section-head p{ color:var(--kinari-mute); font-size:13.5px; margin-top:6px; max-width:46ch; }
+  .more{
+    flex:none; font-size:12px; letter-spacing:.18em; color:var(--kinari-mute);
+    display:inline-flex; align-items:center; gap:8px; padding-bottom:4px;
+    border-bottom:1px solid transparent; transition:.4s var(--ease);
+    white-space:nowrap;
+  }
+  .more:hover{ color:var(--gold); border-color:var(--line); }
+  .more::after{ content:"→"; transition:transform .4s var(--ease); }
+  .more:hover::after{ transform:translateX(4px); }
+
+  section{ position:relative; z-index:2; }
+
+  /* =================== HEADER =================== */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    transition:background .5s var(--ease), border-color .5s var(--ease), backdrop-filter .5s;
+    border-bottom:1px solid transparent;
+  }
+  header.scrolled{
+    background:rgba(12,10,9,.82);
+    backdrop-filter:blur(14px) saturate(120%);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .nav{
+    display:flex; align-items:center; gap:38px;
+    height:74px;
+  }
+  .logo{
+    font-family:var(--serif);
+    font-size:21px; letter-spacing:.16em; font-weight:600;
+    display:flex; align-items:center; gap:11px;
+    white-space:nowrap;
+  }
+  .logo .seal{
+    width:30px; height:30px; flex:none;
+    display:grid; place-items:center;
+    border:1px solid var(--gold); border-radius:50%;
+    color:var(--gold); font-size:13px;
+    font-family:var(--serif);
+  }
+  .logo b{ font-weight:600; }
+  .logo .gold{ color:var(--gold); }
+
+  nav.menu{ display:flex; gap:30px; margin-left:8px; }
+  nav.menu a{
+    font-size:13.5px; letter-spacing:.1em; color:var(--kinari-mute);
+    position:relative; padding:6px 0; transition:color .35s;
+  }
+  nav.menu a::after{
+    content:""; position:absolute; left:0; bottom:0; height:1px; width:0;
+    background:var(--gold); transition:width .4s var(--ease);
+  }
+  nav.menu a:hover{ color:var(--kinari); }
+  nav.menu a:hover::after{ width:100%; }
+
+  .nav-right{ margin-left:auto; display:flex; align-items:center; gap:20px; }
+  .btn{
+    font-size:13px; letter-spacing:.08em; border-radius:2px;
+    padding:11px 22px; transition:.4s var(--ease); white-space:nowrap;
+  }
+  .btn-ghost{ color:var(--kinari-mute); }
+  .btn-ghost:hover{ color:var(--kinari); }
+  .btn-gold{
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold) 60%,var(--gold-deep));
+    color:#1a140a; font-weight:700;
+    box-shadow:0 6px 22px -10px rgba(200,168,106,.7);
+  }
+  .btn-gold:hover{ transform:translateY(-1px); box-shadow:0 10px 30px -10px rgba(200,168,106,.85); }
+  .btn-line{ border:1px solid var(--line); color:var(--kinari); }
+  .btn-line:hover{ border-color:var(--gold); background:rgba(200,168,106,.06); }
+
+  .hamburger{ display:none; width:30px; height:20px; position:relative; }
+  .hamburger span{ position:absolute; left:0; right:0; height:1.5px; background:var(--kinari); transition:.4s; }
+  .hamburger span:nth-child(1){ top:0; }
+  .hamburger span:nth-child(2){ top:9px; }
+  .hamburger span:nth-child(3){ top:18px; }
+
+  /* =================== HERO =================== */
+  .hero{
+    position:relative; min-height:100vh; display:flex; align-items:flex-end;
+    overflow:hidden;
+  }
+  /* シネマティックな湯けむりの夕景（CSSグラデで構築） */
+  .hero-bg{
+    position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(120% 90% at 78% 18%, rgba(200,168,106,.20), transparent 46%),
+      radial-gradient(140% 120% at 88% 8%,  rgba(177,75,58,.16), transparent 50%),
+      linear-gradient(180deg, #1c2530 0%, #18202b 22%, #20211d 52%, #16110d 80%, var(--sumi) 100%);
+  }
+  /* 遠景の山並みのシルエット */
+  .hero-bg::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:46%;
+    background:
+      radial-gradient(60% 100% at 20% 100%, rgba(8,6,5,.9), transparent 70%),
+      radial-gradient(70% 120% at 60% 100%, rgba(10,8,6,.95), transparent 72%),
+      radial-gradient(80% 130% at 95% 100%, rgba(6,5,4,.96), transparent 74%);
+    -webkit-mask:linear-gradient(180deg,transparent,#000 38%);
+            mask:linear-gradient(180deg,transparent,#000 38%);
+  }
+  /* 湯けむり（ゆらめくレイヤー） */
+  .steam{ position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.5; }
+  .steam span{
+    position:absolute; bottom:-12%;
+    width:46vmax; height:46vmax; border-radius:50%;
+    background:radial-gradient(circle, rgba(236,228,213,.16), transparent 62%);
+    filter:blur(40px);
+    animation:rise 19s var(--ease) infinite;
+  }
+  .steam span:nth-child(1){ left:8%;  animation-delay:0s;   }
+  .steam span:nth-child(2){ left:42%; animation-delay:-7s;  transform:scale(1.3); }
+  .steam span:nth-child(3){ left:70%; animation-delay:-13s; }
+  @keyframes rise{
+    0%{   transform:translateY(8%) scale(.9);  opacity:0; }
+    25%{  opacity:.7; }
+    60%{  opacity:.5; }
+    100%{ transform:translateY(-42%) scale(1.25); opacity:0; }
+  }
+  /* 下部へ向けて地の色へ溶かす */
+  .hero::after{
+    content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:linear-gradient(180deg, transparent 40%, rgba(12,10,9,.55) 72%, var(--sumi) 100%),
+               linear-gradient(90deg, rgba(12,10,9,.7) 0%, transparent 42%);
+  }
+
+  .hero-inner{ position:relative; z-index:3; width:100%; padding-bottom:clamp(60px,11vh,120px); padding-top:120px; }
+  .hero-copy{ max-width:640px; }
+  .hero .eyebrow{ margin-bottom:26px; }
+  .hero h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(34px,5.6vw,62px);
+    line-height:1.28;
+    letter-spacing:.04em;
+    text-shadow:0 2px 40px rgba(0,0,0,.5);
+  }
+  .hero h1 .gold{ color:var(--gold-soft); }
+  .hero .lead{
+    margin-top:24px; font-size:clamp(14px,1.4vw,16px);
+    color:var(--kinari-mute); max-width:48ch; line-height:1.95;
+  }
+  .hero-cta{ display:flex; flex-wrap:wrap; gap:16px; margin-top:38px; }
+  .hero-cta .btn{ padding:15px 30px; font-size:14px; }
+  .hero-meta{
+    display:flex; gap:30px; margin-top:42px; flex-wrap:wrap;
+    color:var(--kinari-mute); font-size:12.5px; letter-spacing:.1em;
+  }
+  .hero-meta .num{ font-family:var(--serif); font-size:21px; color:var(--gold-soft); display:block; letter-spacing:.06em; }
+
+  .scroll-hint{
+    position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:3;
+    font-size:10px; letter-spacing:.4em; color:var(--kinari-dim); writing-mode:vertical-rl;
+    display:flex; align-items:center; gap:12px;
+  }
+  .scroll-hint::after{ content:""; width:1px; height:46px; background:linear-gradient(var(--gold),transparent); animation:trickle 2.4s var(--ease) infinite; }
+  @keyframes trickle{ 0%{ transform:scaleY(.2); opacity:0; transform-origin:top; } 40%{ opacity:1; } 100%{ transform:scaleY(1); opacity:0; transform-origin:top; } }
+
+  /* =================== RAILS (Netflix風) =================== */
+  .rail-section{ padding:clamp(54px,7vw,90px) 0 0; }
+  .rail-section:first-of-type{ padding-top:clamp(70px,9vw,120px); }
+
+  .rail-wrap{ position:relative; }
+  .rail{
+    display:flex; gap:18px; overflow-x:auto; scroll-behavior:smooth;
+    padding:6px 0 20px; scroll-snap-type:x proximity;
+    -ms-overflow-style:none; scrollbar-width:none;
+    /* 端のフェード */
+    -webkit-mask:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent);
+            mask:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent);
+  }
+  .rail::-webkit-scrollbar{ display:none; }
+
+  .card{
+    flex:0 0 clamp(240px,26vw,310px);
+    scroll-snap-align:start;
+    cursor:pointer;
+  }
+  .card .thumb{
+    position:relative; aspect-ratio:16/10; border-radius:4px; overflow:hidden;
+    border:1px solid var(--line-soft);
+    transition:transform .5s var(--ease), box-shadow .5s var(--ease), border-color .5s;
+  }
+  .card:hover .thumb{
+    transform:translateY(-6px);
+    box-shadow:0 24px 50px -22px rgba(0,0,0,.85);
+    border-color:var(--line);
+  }
+  .thumb .scene{ position:absolute; inset:0; }
+  .thumb::after{ /* シネマ調の暗部 */
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg,transparent 38%,rgba(8,6,5,.86) 100%);
+  }
+  .thumb .badge{
+    position:absolute; top:10px; left:10px; z-index:3;
+    font-size:10px; letter-spacing:.14em; padding:5px 10px;
+    background:rgba(12,10,9,.62); border:1px solid var(--line);
+    color:var(--gold-soft); border-radius:2px; backdrop-filter:blur(4px);
+  }
+  .thumb .dur{
+    position:absolute; bottom:10px; right:10px; z-index:3;
+    font-size:11px; letter-spacing:.06em; color:var(--kinari);
+    background:rgba(12,10,9,.6); padding:3px 8px; border-radius:2px;
+  }
+  .thumb .play{
+    position:absolute; inset:0; z-index:3; display:grid; place-items:center;
+    opacity:0; transition:opacity .45s var(--ease);
+  }
+  .thumb .play span{
+    width:54px; height:54px; border-radius:50%; display:grid; place-items:center;
+    border:1px solid var(--gold); color:var(--gold-soft);
+    background:rgba(12,10,9,.45); backdrop-filter:blur(2px); font-size:15px; padding-left:3px;
+  }
+  .card:hover .thumb .play{ opacity:1; }
+
+  .card .info{ padding:13px 2px 0; }
+  .card .info h3{ font-family:var(--serif); font-size:15.5px; font-weight:600; letter-spacing:.04em; }
+  .card .info .sub{ font-size:12px; color:var(--kinari-dim); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
+  .card .info .sub .dot{ color:var(--gold-deep); }
+
+  /* 横スクロール矢印 */
+  .rail-nav{
+    position:absolute; top:0; bottom:36px; width:62px; z-index:5;
+    display:grid; place-items:center; border:none; opacity:0; transition:opacity .4s;
+  }
+  .rail-wrap:hover .rail-nav{ opacity:1; }
+  .rail-nav.left{ left:calc(var(--gut) * -1); background:linear-gradient(90deg,var(--sumi),transparent); }
+  .rail-nav.right{ right:calc(var(--gut) * -1); background:linear-gradient(270deg,var(--sumi),transparent); }
+  .rail-nav i{ width:42px; height:42px; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; color:var(--gold-soft); font-style:normal; background:rgba(12,10,9,.6); }
+  .rail-nav:hover i{ border-color:var(--gold); background:rgba(200,168,106,.08); }
+
+  /* 仮のシーン（CSSグラデで温泉旅の情景を表現） */
+  .s1{ background:linear-gradient(160deg,#2b3a44,#16242c 55%,#0d141a); }
+  .s2{ background:linear-gradient(160deg,#3a2a20,#241611 60%,#120b07); }
+  .s3{ background:linear-gradient(160deg,#33414a,#22323b 50%,#101a20); }
+  .s4{ background:linear-gradient(160deg,#402d2a,#291815 55%,#140b09); }
+  .s5{ background:linear-gradient(160deg,#27343b,#1a262d 55%,#0d1418); }
+  .s6{ background:linear-gradient(160deg,#3d3326,#272018 55%,#13100b); }
+  .s7{ background:linear-gradient(160deg,#2e3c3a,#1d2826 55%,#0e1413); }
+  .s8{ background:linear-gradient(160deg,#43342c,#2a1f19 55%,#150e0a); }
+  /* シーンの中に光・湯気の質感を足す */
+  .scene.atmo::before{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(70% 60% at 72% 22%, rgba(236,228,213,.22), transparent 60%);
+  }
+  .scene.atmo::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(40% 50% at 30% 88%, rgba(200,168,106,.16), transparent 70%);
+  }
+
+  /* =================== RANKING =================== */
+  .ranking{ padding:clamp(60px,8vw,100px) 0 0; }
+  .rank-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 30px; }
+  .rank-tab{
+    font-size:12.5px; letter-spacing:.12em; padding:9px 18px; border-radius:2px;
+    color:var(--kinari-mute); border:1px solid var(--line-soft); transition:.35s var(--ease);
+  }
+  .rank-tab[aria-selected="true"]{
+    color:#1a140a; font-weight:700;
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+    border-color:transparent;
+  }
+  .rank-tab:hover:not([aria-selected="true"]){ color:var(--kinari); border-color:var(--line); }
+
+  .rank-grid{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:20px;
+  }
+  .rank-panel{ display:none; }
+  .rank-panel.active{ display:block; animation:fade .5s var(--ease); }
+  @keyframes fade{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none; } }
+
+  .rank-item{ position:relative; cursor:pointer; }
+  .rank-item .rk-thumb{
+    position:relative; aspect-ratio:3/4; border-radius:4px; overflow:hidden;
+    border:1px solid var(--line-soft); transition:.5s var(--ease);
+  }
+  .rank-item:hover .rk-thumb{ border-color:var(--line); transform:translateY(-5px); box-shadow:0 22px 44px -22px rgba(0,0,0,.8); }
+  .rank-item .rk-thumb::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 35%,rgba(8,6,5,.9)); }
+  .rank-num{
+    position:absolute; left:-6px; bottom:-14px; z-index:4;
+    font-family:var(--serif); font-size:clamp(50px,6vw,74px); line-height:.8;
+    color:transparent; -webkit-text-stroke:1.4px var(--gold); font-weight:700;
+    text-shadow:0 4px 24px rgba(0,0,0,.5);
+  }
+  .rank-item:nth-child(1) .rank-num{ -webkit-text-stroke-color:var(--gold-soft); color:rgba(200,168,106,.12); }
+  .rank-meta{ position:absolute; left:14px; right:12px; bottom:12px; z-index:5; }
+  .rank-meta .rk-title{ font-family:var(--serif); font-size:14px; font-weight:600; letter-spacing:.03em; }
+  .rank-meta .rk-sub{ font-size:11px; color:var(--kinari-mute); margin-top:4px; display:flex; align-items:center; gap:7px; }
+  .rk-trend{ color:var(--gold-soft); }
+  .rk-trend.up::before{ content:"▲ "; color:#7fae7f; font-size:9px; }
+  .rk-trend.hot::before{ content:"🔥 "; }
+
+  /* =================== MODELS =================== */
+  .models{ padding:clamp(64px,8vw,104px) 0 0; }
+  .model-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+  .model{ cursor:pointer; }
+  .model .m-photo{
+    position:relative; aspect-ratio:4/5; border-radius:4px; overflow:hidden;
+    border:1px solid var(--line-soft); transition:.55s var(--ease);
+  }
+  .model:hover .m-photo{ border-color:var(--line); box-shadow:0 26px 50px -24px rgba(0,0,0,.85); }
+  .model .m-photo::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 42%,rgba(8,6,5,.92)); }
+  .m-info{ position:absolute; left:18px; right:16px; bottom:16px; z-index:3; }
+  .m-info .m-name{ font-family:var(--serif); font-size:19px; font-weight:600; letter-spacing:.06em; }
+  .m-info .m-name small{ display:block; font-size:10.5px; letter-spacing:.28em; color:var(--gold-soft); margin-bottom:3px; font-family:var(--sans); }
+  .m-info .m-tags{ display:flex; gap:7px; flex-wrap:wrap; margin-top:9px; }
+  .m-info .m-tags span{ font-size:10.5px; letter-spacing:.06em; color:var(--kinari-mute); border:1px solid var(--line-soft); padding:3px 9px; border-radius:2px; background:rgba(12,10,9,.4); }
+  .m-links{ position:absolute; top:14px; right:14px; z-index:3; display:flex; gap:8px; opacity:0; transition:.45s var(--ease); transform:translateY(-6px); }
+  .model:hover .m-links{ opacity:1; transform:none; }
+  .m-links a{ width:30px; height:30px; display:grid; place-items:center; border-radius:50%; border:1px solid var(--line); background:rgba(12,10,9,.55); font-size:11px; color:var(--gold-soft); backdrop-filter:blur(3px); }
+  .m-links a:hover{ border-color:var(--gold); background:rgba(200,168,106,.1); }
+  .m-works{ position:absolute; left:18px; bottom:16px; z-index:2; }
+
+  /* =================== FEATURES =================== */
+  .features{ padding:clamp(64px,8vw,104px) 0 0; }
+  .feat-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr; grid-template-rows:auto auto; gap:18px; }
+  .feat{
+    position:relative; border-radius:5px; overflow:hidden; min-height:230px;
+    display:flex; align-items:flex-end; cursor:pointer; border:1px solid var(--line-soft);
+    transition:.5s var(--ease);
+  }
+  .feat:hover{ border-color:var(--line); }
+  .feat .scene{ position:absolute; inset:0; transition:transform .8s var(--ease); }
+  .feat:hover .scene{ transform:scale(1.05); }
+  .feat::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(8,6,5,.1) 30%,rgba(8,6,5,.9)); }
+  .feat-body{ position:relative; z-index:2; padding:26px 28px; }
+  .feat-body .eyebrow{ font-size:10.5px; }
+  .feat-body h3{ font-family:var(--serif); font-size:clamp(19px,2.4vw,26px); font-weight:600; letter-spacing:.05em; margin-top:12px; line-height:1.4; }
+  .feat-body p{ font-size:12.5px; color:var(--kinari-mute); margin-top:8px; max-width:34ch; }
+  .feat.big{ grid-row:span 2; min-height:auto; }
+
+  /* =================== PLANS =================== */
+  .plans{ padding:clamp(70px,9vw,120px) 0; }
+  .plan-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:36px; }
+  .plan{
+    position:relative; border:1px solid var(--line-soft); border-radius:6px;
+    padding:40px 38px; background:
+      linear-gradient(180deg,rgba(26,23,20,.7),rgba(18,16,14,.7));
+    transition:.5s var(--ease); overflow:hidden;
+  }
+  .plan::before{ content:""; position:absolute; inset:0; opacity:.5;
+    background:radial-gradient(80% 60% at 80% 0%, rgba(200,168,106,.07), transparent 60%); }
+  .plan:hover{ border-color:var(--line); transform:translateY(-4px); }
+  .plan.featured{ border-color:var(--line); background:linear-gradient(180deg,rgba(34,29,24,.85),rgba(20,17,14,.85)); }
+  .plan .tag{ font-size:10.5px; letter-spacing:.24em; color:var(--gold); margin-bottom:14px; display:inline-block; }
+  .plan h3{ font-family:var(--serif); font-size:24px; font-weight:600; letter-spacing:.06em; }
+  .plan .desc{ color:var(--kinari-mute); font-size:13px; margin-top:10px; line-height:1.8; min-height:48px; }
+  .plan .price{ font-family:var(--serif); margin-top:24px; display:flex; align-items:baseline; gap:6px; }
+  .plan .price b{ font-size:42px; color:var(--gold-soft); font-weight:600; letter-spacing:.02em; }
+  .plan .price .cur{ font-size:18px; color:var(--gold-soft); }
+  .plan .price .per{ font-size:12.5px; color:var(--kinari-dim); letter-spacing:.08em; }
+  .plan ul{ margin:26px 0 30px; display:flex; flex-direction:column; gap:12px; }
+  .plan li{ font-size:13px; color:var(--kinari); display:flex; gap:11px; align-items:flex-start; }
+  .plan li::before{ content:"湯"; flex:none; width:19px; height:19px; border-radius:50%; border:1px solid var(--gold-deep); color:var(--gold-soft); font-size:10px; font-family:var(--serif); display:grid; place-items:center; margin-top:2px; }
+  .plan .btn{ width:100%; text-align:center; display:block; padding:15px; }
+  .featured-ribbon{ position:absolute; top:18px; right:-34px; transform:rotate(45deg); background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#1a140a; font-size:10.5px; letter-spacing:.2em; font-weight:700; padding:6px 40px; }
+  .plan-note{ text-align:center; color:var(--kinari-dim); font-size:11.5px; margin-top:24px; letter-spacing:.06em; }
+
+  /* =================== JOIN BAND =================== */
+  .join{
+    position:relative; overflow:hidden; text-align:center;
+    padding:clamp(72px,11vw,140px) 0;
+    border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft);
+  }
+  .join-bg{ position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(70% 120% at 50% 0%, rgba(200,168,106,.14), transparent 55%),
+      linear-gradient(180deg,#1a1410,var(--sumi)); }
+  .join .wrap{ position:relative; z-index:2; }
+  .join h2{ font-family:var(--serif); font-size:clamp(26px,4vw,42px); font-weight:600; letter-spacing:.06em; line-height:1.4; }
+  .join p{ color:var(--kinari-mute); margin:20px auto 0; max-width:44ch; font-size:14px; line-height:1.95; }
+  .join .hero-cta{ justify-content:center; }
+
+  /* =================== FOOTER =================== */
+  footer{ background:var(--ink); padding:clamp(56px,7vw,84px) 0 36px; position:relative; z-index:2; }
+  .foot-top{ display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:40px; padding-bottom:48px; border-bottom:1px solid var(--line-soft); }
+  .foot-brand .logo{ font-size:20px; margin-bottom:18px; }
+  .foot-brand p{ color:var(--kinari-dim); font-size:12.5px; line-height:1.9; max-width:34ch; }
+  .foot-col h4{ font-family:var(--serif); font-size:13px; letter-spacing:.18em; color:var(--gold-soft); margin-bottom:18px; font-weight:600; }
+  .foot-col a{ display:block; font-size:12.5px; color:var(--kinari-mute); padding:6px 0; transition:color .3s; }
+  .foot-col a:hover{ color:var(--kinari); }
+  .foot-bottom{ display:flex; justify-content:space-between; align-items:center; gap:20px; padding-top:30px; flex-wrap:wrap; }
+  .foot-bottom small{ color:var(--kinari-dim); font-size:11.5px; letter-spacing:.06em; }
+  .foot-bottom .age{ border:1px solid var(--line); color:var(--gold-soft); font-size:10.5px; letter-spacing:.1em; padding:6px 12px; border-radius:2px; }
+
+  /* =================== RESPONSIVE =================== */
+  @media (max-width:1080px){
+    .rank-grid{ grid-template-columns:repeat(3,1fr); }
+    .rank-item:nth-child(4),.rank-item:nth-child(5){ display:none; }
+    .model-grid{ grid-template-columns:repeat(3,1fr); }
+    .model:nth-child(4){ display:none; }
+  }
+  @media (max-width:860px){
+    nav.menu, .nav-right .btn-ghost, .nav-right .btn-line{ display:none; }
+    .hamburger{ display:block; }
+    .feat-grid{ grid-template-columns:1fr 1fr; }
+    .feat.big{ grid-row:auto; grid-column:span 2; }
+    .plan-grid{ grid-template-columns:1fr; }
+    .foot-top{ grid-template-columns:1fr 1fr; gap:32px; }
+  }
+  @media (max-width:620px){
+    :root{ --gut:20px; }
+    .nav{ height:62px; }
+    .logo{ font-size:18px; }
+    .hero-inner{ padding-top:100px; }
+    .rank-grid{ grid-template-columns:repeat(2,1fr); }
+    .rank-item:nth-child(3){ display:block; }
+    .model-grid{ grid-template-columns:repeat(2,1fr); }
+    .model:nth-child(4){ display:block; }
+    .feat-grid{ grid-template-columns:1fr; }
+    .feat.big{ grid-column:auto; }
+    .foot-top{ grid-template-columns:1fr 1fr; }
+    .hero-meta{ gap:22px; }
+    .section-head{ flex-direction:column; align-items:flex-start; }
+  }
+
+  /* mobile drawer */
+  .drawer{ position:fixed; inset:0; z-index:60; background:rgba(8,6,5,.97); backdrop-filter:blur(8px); display:flex; flex-direction:column; padding:90px var(--gut) 40px; gap:6px; transform:translateX(100%); transition:transform .5s var(--ease); }
+  .drawer.open{ transform:none; }
+  .drawer a{ font-family:var(--serif); font-size:20px; letter-spacing:.1em; padding:16px 0; border-bottom:1px solid var(--line-soft); }
+  .drawer .btn{ margin-top:20px; text-align:center; padding:15px; }
+  .drawer-close{ position:absolute; top:24px; right:var(--gut); font-size:26px; color:var(--kinari-mute); }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header id="hdr">
+  <div class="wrap nav">
+    <a href="#" class="logo"><span class="seal">温</span><b>温泉アイドル<span class="gold">図鑑</span></b></a>
+    <nav class="menu">
+      <a href="#works">動画一覧</a>
+      <a href="#ranking">ランキング</a>
+      <a href="#models">モデル一覧</a>
+      <a href="#features">特集</a>
+      <a href="#plans">料金プラン</a>
+    </nav>
+    <div class="nav-right">
+      <a href="#" class="btn btn-ghost">ログイン</a>
+      <a href="#plans" class="btn btn-gold">新規登録</a>
+      <button class="hamburger" id="burger" aria-label="メニュー"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- mobile drawer -->
+<div class="drawer" id="drawer">
+  <button class="drawer-close" id="drawerClose" aria-label="閉じる">×</button>
+  <a href="#works">動画一覧</a>
+  <a href="#ranking">ランキング</a>
+  <a href="#models">モデル一覧</a>
+  <a href="#features">特集</a>
+  <a href="#plans">料金プラン</a>
+  <a href="#" class="btn btn-line">ログイン</a>
+  <a href="#plans" class="btn btn-gold">新規登録</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="steam"><span></span><span></span><span></span></div>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow">Onsen Idol Channel</span>
+      <h1>湯けむりの先に、<br>まだ知らない<span class="gold">物語</span>。</h1>
+      <p class="lead">温泉旅番組 × 観光メディア × ファンコンテンツ。<br>名湯をめぐる旅と、そこで出会う表情を、シネマティックな映像で。癒しと憧れが交差する、会員制の映像体験。</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-line">無料サンプルを見る</a>
+        <a href="#plans" class="btn btn-gold">会員登録して見放題</a>
+      </div>
+      <div class="hero-meta">
+        <div><span class="num">320<small>＋</small></span>配信作品</div>
+        <div><span class="num">48</span>出演モデル</div>
+        <div><span class="num">68</span>取材した名湯</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">SCROLL</div>
+</section>
+
+<!-- ============ おすすめ作品 ============ -->
+<section class="rail-section wrap" id="works">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Editor's Selection</span>
+      <h2>編集部が選ぶ、今夜の一湯</h2>
+      <p>湯けむりの情緒と旅の高揚を、もっとも美しく味わえる作品を厳選しました。</p>
+    </div>
+    <a href="#" class="more">すべて見る</a>
+  </div>
+  <div class="rail-wrap">
+    <button class="rail-nav left" data-dir="-1"><i>‹</i></button>
+    <button class="rail-nav right" data-dir="1"><i>›</i></button>
+    <div class="rail">
+      <article class="card"><div class="thumb"><div class="scene s1 atmo"></div><span class="badge">独占配信</span><span class="dur">42:10</span><div class="play"><span>▶</span></div></div><div class="info"><h3>霧氷の宿、雪見の露天</h3><div class="sub"><span>奥飛騨・乳白の湯</span><span class="dot">・</span><span>桐谷 凛</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s2 atmo"></div><span class="badge">4K</span><span class="dur">38:54</span><div class="play"><span>▶</span></div></div><div class="info"><h3>木漏れ日の渓谷宿にて</h3><div class="sub"><span>黒川・里山の湯</span><span class="dot">・</span><span>白瀬 さや</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s3 atmo"></div><span class="badge">特集</span><span class="dur">51:22</span><div class="play"><span>▶</span></div></div><div class="info"><h3>瀬戸の島、夕凪の湯宿</h3><div class="sub"><span>小豆島・潮見の湯</span><span class="dot">・</span><span>柚木 ひなた</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s4 atmo"></div><span class="badge">独占配信</span><span class="dur">44:08</span><div class="play"><span>▶</span></div></div><div class="info"><h3>灯ともし頃の温泉街</h3><div class="sub"><span>城崎・外湯めぐり</span><span class="dot">・</span><span>七海 あおい</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s5 atmo"></div><span class="badge">4K</span><span class="dur">36:40</span><div class="play"><span>▶</span></div></div><div class="info"><h3>朝霧の立つ、山あいの宿</h3><div class="sub"><span>白骨・乳白の湯</span><span class="dot">・</span><span>東雲 まり</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s6 atmo"></div><span class="badge">新着</span><span class="dur">47:31</span><div class="play"><span>▶</span></div></div><div class="info"><h3>紅葉に染まる秘湯の宿</h3><div class="sub"><span>蔵王・高湯めぐり</span><span class="dot">・</span><span>桐谷 凛</span></div></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 新着動画 ============ -->
+<section class="rail-section wrap">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">New Arrivals</span>
+      <h2>今週、あたらしく届いた旅</h2>
+      <p>毎週金曜更新。撮りおろしの新作を、いち早くお楽しみいただけます。</p>
+    </div>
+    <a href="#" class="more">新着をすべて見る</a>
+  </div>
+  <div class="rail-wrap">
+    <button class="rail-nav left" data-dir="-1"><i>‹</i></button>
+    <button class="rail-nav right" data-dir="1"><i>›</i></button>
+    <div class="rail">
+      <article class="card"><div class="thumb"><div class="scene s7 atmo"></div><span class="badge">NEW</span><span class="dur">33:05</span><div class="play"><span>▶</span></div></div><div class="info"><h3>湯上がりの縁側、午後の光</h3><div class="sub"><span>由布院・盆地の湯</span><span class="dot">・</span><span>6/13 公開</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s8 atmo"></div><span class="badge">NEW</span><span class="dur">40:18</span><div class="play"><span>▶</span></div></div><div class="info"><h3>潮騒を聴く、岬の露天</h3><div class="sub"><span>白浜・海辺の湯</span><span class="dot">・</span><span>6/13 公開</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s1 atmo"></div><span class="badge">NEW</span><span class="dur">29:47</span><div class="play"><span>▶</span></div></div><div class="info"><h3>提灯あかりの路地裏散歩</h3><div class="sub"><span>銀山・大正ロマンの湯</span><span class="dot">・</span><span>6/13 公開</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s3 atmo"></div><span class="badge">NEW</span><span class="dur">45:52</span><div class="play"><span>▶</span></div></div><div class="info"><h3>朝市と、湯の街の目覚め</h3><div class="sub"><span>下呂・川沿いの湯</span><span class="dot">・</span><span>6/13 公開</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s6 atmo"></div><span class="badge">NEW</span><span class="dur">37:14</span><div class="play"><span>▶</span></div></div><div class="info"><h3>雨上がり、苔むす庭園湯</h3><div class="sub"><span>箱根・山あいの湯</span><span class="dot">・</span><span>6/06 公開</span></div></div></article>
+      <article class="card"><div class="thumb"><div class="scene s4 atmo"></div><span class="badge">NEW</span><span class="dur">42:39</span><div class="play"><span>▶</span></div></div><div class="info"><h3>星明かりの貸切露天</h3><div class="sub"><span>乳頭・ブナ林の湯</span><span class="dot">・</span><span>6/06 公開</span></div></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ランキング ============ -->
+<section class="ranking wrap" id="ranking">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Ranking</span>
+      <h2>いま、いちばん観られている旅</h2>
+      <p>視聴データをもとに集計。週間・月間・急上昇、そして人気モデルから。</p>
+    </div>
+  </div>
+  <div class="rank-tabs" role="tablist">
+    <button class="rank-tab" role="tab" aria-selected="true" data-tab="week">週間ランキング</button>
+    <button class="rank-tab" role="tab" aria-selected="false" data-tab="month">月間ランキング</button>
+    <button class="rank-tab" role="tab" aria-selected="false" data-tab="hot">急上昇</button>
+    <button class="rank-tab" role="tab" aria-selected="false" data-tab="model">人気モデル</button>
+  </div>
+
+  <!-- 週間 -->
+  <div class="rank-panel active" data-panel="week">
+    <div class="rank-grid">
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s2 atmo"></div></div><span class="rank-num">1</span><div class="rank-meta"><div class="rk-title">霧氷の宿、雪見の露天</div><div class="rk-sub">桐谷 凛<span class="rk-trend up">継続1位</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s3 atmo"></div></div><span class="rank-num">2</span><div class="rank-meta"><div class="rk-title">瀬戸の島、夕凪の湯宿</div><div class="rk-sub">柚木 ひなた<span class="rk-trend up">＋3</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s4 atmo"></div></div><span class="rank-num">3</span><div class="rank-meta"><div class="rk-title">灯ともし頃の温泉街</div><div class="rk-sub">七海 あおい<span class="rk-trend up">＋1</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s5 atmo"></div></div><span class="rank-num">4</span><div class="rank-meta"><div class="rk-title">朝霧の立つ、山あいの宿</div><div class="rk-sub">東雲 まり<span class="rk-trend">－2</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s6 atmo"></div></div><span class="rank-num">5</span><div class="rank-meta"><div class="rk-title">紅葉に染まる秘湯の宿</div><div class="rk-sub">桐谷 凛<span class="rk-trend up">＋4</span></div></div></div>
+    </div>
+  </div>
+  <!-- 月間 -->
+  <div class="rank-panel" data-panel="month">
+    <div class="rank-grid">
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s4 atmo"></div></div><span class="rank-num">1</span><div class="rank-meta"><div class="rk-title">灯ともし頃の温泉街</div><div class="rk-sub">七海 あおい<span class="rk-trend up">月間首位</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s2 atmo"></div></div><span class="rank-num">2</span><div class="rank-meta"><div class="rk-title">霧氷の宿、雪見の露天</div><div class="rk-sub">桐谷 凛</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s1 atmo"></div></div><span class="rank-num">3</span><div class="rank-meta"><div class="rk-title">提灯あかりの路地裏散歩</div><div class="rk-sub">白瀬 さや</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s6 atmo"></div></div><span class="rank-num">4</span><div class="rank-meta"><div class="rk-title">紅葉に染まる秘湯の宿</div><div class="rk-sub">桐谷 凛</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s7 atmo"></div></div><span class="rank-num">5</span><div class="rank-meta"><div class="rk-title">湯上がりの縁側、午後の光</div><div class="rk-sub">柚木 ひなた</div></div></div>
+    </div>
+  </div>
+  <!-- 急上昇 -->
+  <div class="rank-panel" data-panel="hot">
+    <div class="rank-grid">
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s8 atmo"></div></div><span class="rank-num">1</span><div class="rank-meta"><div class="rk-title">潮騒を聴く、岬の露天</div><div class="rk-sub">東雲 まり<span class="rk-trend hot">急上昇</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s7 atmo"></div></div><span class="rank-num">2</span><div class="rank-meta"><div class="rk-title">湯上がりの縁側、午後の光</div><div class="rk-sub">柚木 ひなた<span class="rk-trend hot">急上昇</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s1 atmo"></div></div><span class="rank-num">3</span><div class="rank-meta"><div class="rk-title">提灯あかりの路地裏散歩</div><div class="rk-sub">白瀬 さや<span class="rk-trend up">＋12</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s3 atmo"></div></div><span class="rank-num">4</span><div class="rank-meta"><div class="rk-title">朝市と、湯の街の目覚め</div><div class="rk-sub">七海 あおい<span class="rk-trend up">＋9</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s4 atmo"></div></div><span class="rank-num">5</span><div class="rank-meta"><div class="rk-title">星明かりの貸切露天</div><div class="rk-sub">桐谷 凛<span class="rk-trend up">＋7</span></div></div></div>
+    </div>
+  </div>
+  <!-- 人気モデル -->
+  <div class="rank-panel" data-panel="model">
+    <div class="rank-grid">
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s6 atmo"></div></div><span class="rank-num">1</span><div class="rank-meta"><div class="rk-title">桐谷 凛</div><div class="rk-sub">出演 14 作品<span class="rk-trend up">人気No.1</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s3 atmo"></div></div><span class="rank-num">2</span><div class="rank-meta"><div class="rk-title">柚木 ひなた</div><div class="rk-sub">出演 11 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s5 atmo"></div></div><span class="rank-num">3</span><div class="rank-meta"><div class="rk-title">七海 あおい</div><div class="rk-sub">出演 9 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s2 atmo"></div></div><span class="rank-num">4</span><div class="rank-meta"><div class="rk-title">白瀬 さや</div><div class="rk-sub">出演 8 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><div class="scene s8 atmo"></div></div><span class="rank-num">5</span><div class="rank-meta"><div class="rk-title">東雲 まり</div><div class="rk-sub">出演 7 作品</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ モデル一覧 ============ -->
+<section class="models wrap" id="models">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Cast</span>
+      <h2>旅をともにする、彼女たち</h2>
+      <p>名湯を旅し、その土地の表情を映す出演者たち。プロフィールと出演作品へ。</p>
+    </div>
+    <a href="#" class="more">モデルをすべて見る</a>
+  </div>
+  <div class="model-grid">
+    <article class="model"><div class="m-photo"><div class="scene s6 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>KIRITANI RIN</small>桐谷 凛</div><div class="m-tags"><span>東北の湯</span><span>雪見露天</span><span>14作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><div class="scene s3 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>YUNOKI HINATA</small>柚木 ひなた</div><div class="m-tags"><span>瀬戸内</span><span>島宿</span><span>11作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><div class="scene s5 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>NANAMI AOI</small>七海 あおい</div><div class="m-tags"><span>温泉街さんぽ</span><span>外湯</span><span>9作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><div class="scene s2 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>SHIRASE SAYA</small>白瀬 さや</div><div class="m-tags"><span>渓谷の宿</span><span>里山</span><span>8作品</span></div></div></div></article>
+  </div>
+</section>
+
+<!-- ============ 特集 ============ -->
+<section class="features wrap" id="features">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Features</span>
+      <h2>テーマでめぐる、湯の旅</h2>
+      <p>観光メディアとしての視点で、名湯をテーマごとに特集しています。</p>
+    </div>
+    <a href="#" class="more">特集一覧へ</a>
+  </div>
+  <div class="feat-grid">
+    <a href="#" class="feat big"><div class="scene s1 atmo"></div><div class="feat-body"><span class="eyebrow">Open-air</span><h3>絶景露天風呂特集</h3><p>山稜、渓谷、海辺——景色とともに湯に浸かる、選りすぐりの露天をめぐる。</p></div></a>
+    <a href="#" class="feat"><div class="scene s6 atmo"></div><div class="feat-body"><span class="eyebrow">Hidden</span><h3>秘湯めぐり特集</h3><p>地図にない、静かな湯へ。</p></div></a>
+    <a href="#" class="feat"><div class="scene s5 atmo"></div><div class="feat-body"><span class="eyebrow">For Beginners</span><h3>初めての方へ</h3><p>まずはこの3本から。</p></div></a>
+    <a href="#" class="feat"><div class="scene s4 atmo"></div><div class="feat-body"><span class="eyebrow">Pick up</span><h3>人気モデル出演回</h3><p>話題の出演者を一気に。</p></div></a>
+    <a href="#" class="feat"><div class="scene s7 atmo"></div><div class="feat-body"><span class="eyebrow">Season</span><h3>梅雨にひたる、雨の湯</h3><p>雨音と湯けむりの季節特集。</p></div></a>
+  </div>
+</section>
+
+<!-- ============ 料金プラン ============ -->
+<section class="plans wrap" id="plans">
+  <div class="section-head" style="justify-content:center;text-align:center;flex-direction:column;align-items:center;">
+    <span class="eyebrow">Membership</span>
+    <h2 style="font-family:var(--serif);font-size:clamp(24px,3.4vw,34px);font-weight:600;letter-spacing:.06em;margin-top:14px;">あなたの旅の、たのしみ方で。</h2>
+    <p style="color:var(--kinari-mute);font-size:13.5px;margin-top:8px;max-width:46ch;">すべての名湯を旅するか、お気に入りの一人を追いかけるか。いつでも変更・解約いただけます。</p>
+  </div>
+  <div class="plan-grid">
+    <div class="plan featured">
+      <div class="featured-ribbon">人気</div>
+      <span class="tag">PREMIUM</span>
+      <h3>全モデル見放題プラン</h3>
+      <p class="desc">全作品・全出演者が見放題。新作も特集も、すべての旅をひとつのプランで。</p>
+      <div class="price"><span class="cur">¥</span><b>1,980</b><span class="per">／ 月（税込）</span></div>
+      <ul>
+        <li>全 320 作品以上が見放題</li>
+        <li>毎週の新作を追加課金なしで</li>
+        <li>最高 4K・広告なしの視聴体験</li>
+        <li>特集・限定映像へのフルアクセス</li>
+      </ul>
+      <a href="#" class="btn btn-gold">このプランで登録する</a>
+    </div>
+    <div class="plan">
+      <span class="tag">SINGLE</span>
+      <h3>モデル別プラン</h3>
+      <p class="desc">応援したい一人を、じっくりと。選んだ出演者の全作品が見放題になります。</p>
+      <div class="price"><span class="cur">¥</span><b>980</b><span class="per">／ 月（税込・1名）</span></div>
+      <ul>
+        <li>選んだモデルの全出演作が見放題</li>
+        <li>そのモデルの新作をいち早く</li>
+        <li>出演者ごとの限定オフショット</li>
+        <li>いつでもプラン変更が可能</li>
+      </ul>
+      <a href="#" class="btn btn-line">モデルを選んで登録</a>
+    </div>
+  </div>
+  <p class="plan-note">※ まずは無料サンプルから。会員登録なしでも一部映像をご覧いただけます。</p>
+</section>
+
+<!-- ============ JOIN ============ -->
+<section class="join">
+  <div class="join-bg"></div>
+  <div class="wrap">
+    <h2>癒しと憧れが交差する、<br>温泉旅チャンネルへ。</h2>
+    <p>湯けむりの先にある、まだ知らない物語を。今夜、その一湯目を。</p>
+    <div class="hero-cta">
+      <a href="#" class="btn btn-line">無料サンプルを見る</a>
+      <a href="#plans" class="btn btn-gold">会員登録して見放題</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="#" class="logo"><span class="seal">温</span><b>温泉アイドル<span class="gold">図鑑</span></b></a>
+        <p>温泉旅番組 × 観光メディア × ファンコンテンツ。名湯をめぐる旅と、そこで出会う表情を映す、会員制の映像体験プラットフォームです。</p>
+      </div>
+      <div class="foot-col">
+        <h4>サービス</h4>
+        <a href="#works">動画一覧</a>
+        <a href="#ranking">ランキング</a>
+        <a href="#models">モデル一覧</a>
+        <a href="#features">特集</a>
+        <a href="#plans">料金プラン</a>
+      </div>
+      <div class="foot-col">
+        <h4>サポート</h4>
+        <a href="#">ご利用ガイド</a>
+        <a href="#">よくあるご質問</a>
+        <a href="#">お問い合わせ</a>
+        <a href="#">動作環境</a>
+      </div>
+      <div class="foot-col">
+        <h4>運営・規約</h4>
+        <a href="#">サービスについて</a>
+        <a href="#">運営会社</a>
+        <a href="#">利用規約</a>
+        <a href="#">プライバシーポリシー</a>
+        <a href="#">特定商取引法に基づく表記</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <small>© 2026 温泉アイドル図鑑 ｜ Onsen Idol Channel. All rights reserved.</small>
+      <span class="age">本サービスは18歳以上の会員を対象としています</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ヘッダーの背景切り替え
+  const hdr = document.getElementById('hdr');
+  const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 40);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive:true });
+
+  // モバイルドロワー
+  const drawer = document.getElementById('drawer');
+  document.getElementById('burger').addEventListener('click', () => drawer.classList.add('open'));
+  document.getElementById('drawerClose').addEventListener('click', () => drawer.classList.remove('open'));
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+
+  // 横スクロールレールの矢印
+  document.querySelectorAll('.rail-wrap').forEach(wrap => {
+    const rail = wrap.querySelector('.rail');
+    wrap.querySelectorAll('.rail-nav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = Number(btn.dataset.dir);
+        rail.scrollBy({ left: dir * rail.clientWidth * 0.82, behavior:'smooth' });
+      });
+    });
+  });
+
+  // ランキングのタブ切り替え
+  const tabs = document.querySelectorAll('.rank-tab');
+  const panels = document.querySelectorAll('.rank-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.setAttribute('aria-selected', t === tab));
+      panels.forEach(p => p.classList.toggle('active', p.dataset.panel === tab.dataset.tab));
+    });
+  });
+</script>
+</body>
+</html>
