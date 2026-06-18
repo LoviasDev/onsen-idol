@@ -1,3 +1,7 @@
 .DS_Store
 .vercel
 node_modules
+
+# 参考用（公開しない・機密含む）
+tonmana.jpg
+messageImage_*.jpg
