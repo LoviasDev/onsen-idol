@@ -177,7 +177,7 @@
 
   /* =================== HERO =================== */
   .hero{
-    position:relative; min-height:100vh; display:flex; align-items:flex-end;
+    position:relative; min-height:100vh; display:flex; align-items:center;
     overflow:hidden;
   }
   /* シネマティックな湯けむりの夕景（CSSグラデで構築） */
@@ -223,8 +223,13 @@
                linear-gradient(90deg, rgba(12,10,9,.7) 0%, transparent 42%);
   }
 
-  .hero-inner{ position:relative; z-index:3; width:100%; padding-bottom:clamp(60px,11vh,120px); padding-top:120px; }
-  .hero-copy{ max-width:640px; }
+  .hero-inner{
+    position:relative; z-index:3; width:100%;
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);
+    align-items:center; gap:clamp(24px,4vw,64px);
+    padding-top:clamp(96px,12vh,130px); padding-bottom:clamp(48px,8vh,96px);
+  }
+  .hero-copy{ max-width:580px; }
   .hero .eyebrow{ margin-bottom:26px; }
   .hero h1{
     font-family:var(--serif);
@@ -286,6 +291,14 @@
     border-color:var(--line);
   }
   .thumb .scene{ position:absolute; inset:0; }
+  /* 実写を和の色調へ寄せて配置 */
+  .m-photo img, .rk-thumb img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 24%;
+    filter:saturate(.78) contrast(1.04) brightness(.9) sepia(.1);
+    transition:transform 1.2s var(--ease), filter .6s var(--ease);
+  }
+  .model:hover .m-photo img, .rank-item:hover .rk-thumb img{ transform:scale(1.05); filter:saturate(.95) brightness(.98); }
+  .m-photo .scene + img{ display:block; }
   .thumb::after{ /* シネマ調の暗部 */
     content:""; position:absolute; inset:0;
     background:linear-gradient(180deg,transparent 38%,rgba(8,6,5,.86) 100%);
@@ -482,6 +495,94 @@
   .foot-bottom small{ color:var(--kinari-dim); font-size:11.5px; letter-spacing:.06em; }
   .foot-bottom .age{ border:1px solid var(--line); color:var(--gold-soft); font-size:10.5px; letter-spacing:.1em; padding:6px 12px; border-radius:2px; }
 
+  /* =================== 和の装飾（青海波・霞雲・金線・三つ盛紋）=================== */
+  /* 金グラデーションの見出し（tonmana の大見出しを踏襲） */
+  .goldgrad{
+    background:linear-gradient(180deg,#efdcae 0%,#d8c08c 30%,#c8a86a 60%,#9c7d44 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    -webkit-text-fill-color:transparent;
+  }
+
+  /* 青海波（せいがいは）— 角に敷く伝統文様 */
+  .seigaiha{
+    position:absolute; pointer-events:none; z-index:1; opacity:.5;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'%3E%3Cg fill='none' stroke='%23c8a86a' stroke-width='1.2'%3E%3Cpath d='M2 30 A28 28 0 0 1 58 30'/%3E%3Cpath d='M10 30 A20 20 0 0 1 50 30'/%3E%3Cpath d='M18 30 A12 12 0 0 1 42 30'/%3E%3Cpath d='M26 30 A4 4 0 0 1 34 30'/%3E%3C/g%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'%3E%3Cg fill='none' stroke='%23c8a86a' stroke-width='1.2'%3E%3Cpath d='M2 30 A28 28 0 0 1 58 30'/%3E%3Cpath d='M10 30 A20 20 0 0 1 50 30'/%3E%3Cpath d='M18 30 A12 12 0 0 1 42 30'/%3E%3Cpath d='M26 30 A4 4 0 0 1 34 30'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:60px 30px;
+    background-position:0 0, 30px 15px;
+  }
+
+  /* 霞雲（かすみぐも）— 金色のたなびく雲。装飾アイコン */
+  .kasumi{
+    display:inline-block; width:120px; height:52px; pointer-events:none;
+    background:no-repeat center/contain
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 96'%3E%3Cg fill='%23c8a86a'%3E%3Crect x='112' y='4' width='66' height='14' rx='7'/%3E%3Crect x='150' y='26' width='52' height='14' rx='7'/%3E%3Crect x='86' y='26' width='52' height='14' rx='7'/%3E%3Crect x='52' y='48' width='150' height='14' rx='7'/%3E%3Crect x='20' y='48' width='22' height='14' rx='7'/%3E%3Crect x='92' y='70' width='110' height='13' rx='6.5'/%3E%3Crect x='40' y='70' width='40' height='13' rx='6.5'/%3E%3Crect x='8' y='70' width='20' height='13' rx='6.5'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* 三つ盛紋（金の円章） */
+  .mon{
+    width:30px; height:30px; flex:none; pointer-events:none;
+    background:no-repeat center/contain
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23c8a86a' stroke-width='2.4'%3E%3Ccircle cx='50' cy='50' r='47'/%3E%3C/g%3E%3Cg fill='%23c8a86a'%3E%3Ccircle cx='50' cy='30' r='11'/%3E%3Ccircle cx='32' cy='62' r='11'/%3E%3Ccircle cx='68' cy='62' r='11'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* 金二重線ディバイダ（章の区切り。中央に紋） */
+  .divider{ display:flex; align-items:center; justify-content:center; gap:22px; padding:6px 0 2px; }
+  .divider::before, .divider::after{
+    content:""; height:1px; flex:1; max-width:340px;
+    background:linear-gradient(90deg,transparent,var(--gold-deep) 45%,var(--gold) 100%);
+  }
+  .divider::after{ transform:scaleX(-1); }
+  .divider .mon{ width:26px; height:26px; }
+
+  /* セクション見出し脇の霞アイコン */
+  .section-head .kasumi{ width:88px; height:38px; opacity:.6; margin-bottom:14px; }
+
+  /* 山並みのシルエット（金の稜線） */
+  .mountains{
+    position:absolute; left:0; right:0; bottom:0; height:120px; z-index:1; pointer-events:none; opacity:.5;
+    background:no-repeat bottom center/cover
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 160' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%239c7d44' stroke-width='1.4'%3E%3Cpath d='M0 150 L180 70 L300 120 L470 40 L620 110 L760 60 L940 120 L1080 70 L1200 130'/%3E%3Cpath d='M0 160 L220 110 L380 150 L560 90 L720 145 L880 100 L1050 150 L1200 110' stroke='%23c8a86a' opacity='0.6'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* =================== 菱形タイル モザイク（ファーストビュー）=================== */
+  .mosaic{
+    position:relative; width:100%; height:min(80vh,760px);
+    -webkit-mask:radial-gradient(125% 100% at 72% 48%, #000 42%, rgba(0,0,0,.35) 74%, transparent 94%);
+            mask:radial-gradient(125% 100% at 72% 48%, #000 42%, rgba(0,0,0,.35) 74%, transparent 94%);
+  }
+  .mosaic .field{ /* 菱形の隙間にうっすら金を透かす */
+    position:absolute; inset:-4%; z-index:0;
+    background:radial-gradient(60% 60% at 62% 42%, rgba(200,168,106,.30), rgba(120,95,55,.10) 58%, transparent 78%);
+  }
+  .dtile{
+    position:absolute; overflow:hidden; opacity:0;
+    clip-path:polygon(50% 2.5%, 97.5% 50%, 50% 97.5%, 2.5% 50%);
+    box-shadow:inset 0 0 0 1.5px rgba(200,168,106,.42);
+    transition:transform .6s var(--ease), filter .6s var(--ease), z-index 0s;
+    animation:tileIn .9s var(--ease) forwards;
+  }
+  .dtile img{
+    width:100%; height:100%; object-fit:cover; object-position:center 26%;
+    filter:saturate(.7) contrast(1.05) brightness(.84) sepia(.14);
+    transition:filter .7s var(--ease), transform 1.4s var(--ease);
+  }
+  .dtile::after{ /* 和の色調へ寄せるオーバーレイ */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(150deg, rgba(19,28,38,.5), rgba(12,10,9,.12) 52%, rgba(156,125,68,.3));
+    mix-blend-mode:multiply;
+  }
+  .dtile:hover{ transform:scale(1.05); z-index:6; box-shadow:inset 0 0 0 1.5px var(--gold-soft); }
+  .dtile:hover img{ filter:saturate(1) contrast(1.02) brightness(1); transform:scale(1.07); }
+  @keyframes tileIn{ from{ opacity:0; transform:scale(.82); } to{ opacity:1; transform:scale(1); } }
+  /* 浮遊する金の菱形（モザイク周りの装飾） */
+  .gold-diamond{
+    position:absolute; z-index:5; pointer-events:none;
+    border:1px solid var(--gold); transform:rotate(45deg);
+    background:rgba(200,168,106,.04);
+  }
+
   /* =================== RESPONSIVE =================== */
   @media (max-width:1080px){
     .rank-grid{ grid-template-columns:repeat(3,1fr); }
@@ -496,6 +597,9 @@
     .feat.big{ grid-row:auto; grid-column:span 2; }
     .plan-grid{ grid-template-columns:1fr; }
     .foot-top{ grid-template-columns:1fr 1fr; gap:32px; }
+    .hero-inner{ grid-template-columns:1fr; gap:clamp(20px,4vw,32px); }
+    .hero-copy{ max-width:640px; }
+    .mosaic{ height:46vh; min-height:320px; }
   }
   @media (max-width:620px){
     :root{ --gut:20px; }
@@ -511,6 +615,8 @@
     .foot-top{ grid-template-columns:1fr 1fr; }
     .hero-meta{ gap:22px; }
     .section-head{ flex-direction:column; align-items:flex-start; }
+    .mosaic{ height:42vh; min-height:280px; }
+    .seigaiha{ opacity:.28 !important; }
   }
 
   /* mobile drawer */
@@ -558,10 +664,18 @@
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="steam"><span></span><span></span><span></span></div>
+  <!-- 和の装飾：青海波・霞雲・金の菱形・山並み -->
+  <div class="seigaiha" style="top:-12px;right:-12px;width:380px;height:240px;opacity:.4;-webkit-mask:radial-gradient(130% 130% at 100% 0,#000,transparent 68%);mask:radial-gradient(130% 130% at 100% 0,#000,transparent 68%);"></div>
+  <span class="kasumi" style="position:absolute;top:20%;left:-26px;width:210px;height:90px;opacity:.13;z-index:1;"></span>
+  <span class="kasumi" style="position:absolute;bottom:24%;right:4%;width:150px;height:64px;opacity:.12;z-index:1;transform:scaleX(-1);"></span>
+  <span class="gold-diamond" style="width:16px;height:16px;top:14%;left:46%;"></span>
+  <span class="gold-diamond" style="width:26px;height:26px;bottom:18%;right:7%;"></span>
+  <span class="gold-diamond" style="width:10px;height:10px;top:30%;right:3%;background:var(--gold);opacity:.6;"></span>
+  <div class="mountains"></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
       <span class="eyebrow">Onsen Idol Channel</span>
-      <h1>湯けむりの先に、<br>まだ知らない<span class="gold">物語</span>。</h1>
+      <h1>湯けむりの先に、<br>まだ知らない<span class="gold goldgrad">物語</span>。</h1>
       <p class="lead">温泉旅番組 × 観光メディア × ファンコンテンツ。<br>名湯をめぐる旅と、そこで出会う表情を、シネマティックな映像で。癒しと憧れが交差する、会員制の映像体験。</p>
       <div class="hero-cta">
         <a href="#" class="btn btn-line">無料サンプルを見る</a>
@@ -573,14 +687,19 @@
         <div><span class="num">68</span>取材した名湯</div>
       </div>
     </div>
+    <div class="mosaic" id="mosaic"><div class="field"></div></div>
   </div>
   <div class="scroll-hint">SCROLL</div>
 </section>
+
+<!-- 章の区切り -->
+<div class="wrap"><div class="divider" style="margin-top:clamp(40px,6vw,72px)"><span class="mon"></span></div></div>
 
 <!-- ============ おすすめ作品 ============ -->
 <section class="rail-section wrap" id="works">
   <div class="section-head">
     <div>
+      <span class="kasumi" style="display:block"></span>
       <span class="eyebrow">Editor's Selection</span>
       <h2>編集部が選ぶ、今夜の一湯</h2>
       <p>湯けむりの情緒と旅の高揚を、もっとも美しく味わえる作品を厳選しました。</p>
@@ -674,11 +793,11 @@
   <!-- 人気モデル -->
   <div class="rank-panel" data-panel="model">
     <div class="rank-grid">
-      <div class="rank-item"><div class="rk-thumb"><div class="scene s6 atmo"></div></div><span class="rank-num">1</span><div class="rank-meta"><div class="rk-title">桐谷 凛</div><div class="rk-sub">出演 14 作品<span class="rk-trend up">人気No.1</span></div></div></div>
-      <div class="rank-item"><div class="rk-thumb"><div class="scene s3 atmo"></div></div><span class="rank-num">2</span><div class="rank-meta"><div class="rk-title">柚木 ひなた</div><div class="rk-sub">出演 11 作品</div></div></div>
-      <div class="rank-item"><div class="rk-thumb"><div class="scene s5 atmo"></div></div><span class="rank-num">3</span><div class="rank-meta"><div class="rk-title">七海 あおい</div><div class="rk-sub">出演 9 作品</div></div></div>
-      <div class="rank-item"><div class="rk-thumb"><div class="scene s2 atmo"></div></div><span class="rank-num">4</span><div class="rank-meta"><div class="rk-title">白瀬 さや</div><div class="rk-sub">出演 8 作品</div></div></div>
-      <div class="rank-item"><div class="rk-thumb"><div class="scene s8 atmo"></div></div><span class="rank-num">5</span><div class="rank-meta"><div class="rk-title">東雲 まり</div><div class="rk-sub">出演 7 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><img src="img/top3.jpg" alt="桐谷 凛" loading="lazy" /></div><span class="rank-num">1</span><div class="rank-meta"><div class="rk-title">桐谷 凛</div><div class="rk-sub">出演 14 作品<span class="rk-trend up">人気No.1</span></div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><img src="img/top2.jpg" alt="柚木 ひなた" loading="lazy" /></div><span class="rank-num">2</span><div class="rank-meta"><div class="rk-title">柚木 ひなた</div><div class="rk-sub">出演 11 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><img src="img/down4.jpg" alt="七海 あおい" loading="lazy" /></div><span class="rank-num">3</span><div class="rank-meta"><div class="rk-title">七海 あおい</div><div class="rk-sub">出演 9 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><img src="img/top1.jpg" alt="白瀬 さや" loading="lazy" /></div><span class="rank-num">4</span><div class="rank-meta"><div class="rk-title">白瀬 さや</div><div class="rk-sub">出演 8 作品</div></div></div>
+      <div class="rank-item"><div class="rk-thumb"><img src="img/down13.jpg" alt="東雲 まり" loading="lazy" /></div><span class="rank-num">5</span><div class="rank-meta"><div class="rk-title">東雲 まり</div><div class="rk-sub">出演 7 作品</div></div></div>
     </div>
   </div>
 </section>
@@ -687,6 +806,7 @@
 <section class="models wrap" id="models">
   <div class="section-head">
     <div>
+      <span class="kasumi" style="display:block"></span>
       <span class="eyebrow">Cast</span>
       <h2>旅をともにする、彼女たち</h2>
       <p>名湯を旅し、その土地の表情を映す出演者たち。プロフィールと出演作品へ。</p>
@@ -694,10 +814,10 @@
     <a href="#" class="more">モデルをすべて見る</a>
   </div>
   <div class="model-grid">
-    <article class="model"><div class="m-photo"><div class="scene s6 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>KIRITANI RIN</small>桐谷 凛</div><div class="m-tags"><span>東北の湯</span><span>雪見露天</span><span>14作品</span></div></div></div></article>
-    <article class="model"><div class="m-photo"><div class="scene s3 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>YUNOKI HINATA</small>柚木 ひなた</div><div class="m-tags"><span>瀬戸内</span><span>島宿</span><span>11作品</span></div></div></div></article>
-    <article class="model"><div class="m-photo"><div class="scene s5 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>NANAMI AOI</small>七海 あおい</div><div class="m-tags"><span>温泉街さんぽ</span><span>外湯</span><span>9作品</span></div></div></div></article>
-    <article class="model"><div class="m-photo"><div class="scene s2 atmo"></div><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>SHIRASE SAYA</small>白瀬 さや</div><div class="m-tags"><span>渓谷の宿</span><span>里山</span><span>8作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><img src="img/top3.jpg" alt="桐谷 凛" loading="lazy" /><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>KIRITANI RIN</small>桐谷 凛</div><div class="m-tags"><span>東北の湯</span><span>雪見露天</span><span>14作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><img src="img/top2.jpg" alt="柚木 ひなた" loading="lazy" /><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>YUNOKI HINATA</small>柚木 ひなた</div><div class="m-tags"><span>瀬戸内</span><span>島宿</span><span>11作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><img src="img/down4.jpg" alt="七海 あおい" loading="lazy" /><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>NANAMI AOI</small>七海 あおい</div><div class="m-tags"><span>温泉街さんぽ</span><span>外湯</span><span>9作品</span></div></div></div></article>
+    <article class="model"><div class="m-photo"><img src="img/top1.jpg" alt="白瀬 さや" loading="lazy" /><div class="m-links"><a href="#" title="X">𝕏</a><a href="#" title="Instagram">in</a><a href="#" title="出演作品">▶</a></div><div class="m-info"><div class="m-name"><small>SHIRASE SAYA</small>白瀬 さや</div><div class="m-tags"><span>渓谷の宿</span><span>里山</span><span>8作品</span></div></div></div></article>
   </div>
 </section>
 
@@ -705,6 +825,7 @@
 <section class="features wrap" id="features">
   <div class="section-head">
     <div>
+      <span class="kasumi" style="display:block"></span>
       <span class="eyebrow">Features</span>
       <h2>テーマでめぐる、湯の旅</h2>
       <p>観光メディアとしての視点で、名湯をテーマごとに特集しています。</p>
@@ -722,7 +843,9 @@
 
 <!-- ============ 料金プラン ============ -->
 <section class="plans wrap" id="plans">
-  <div class="section-head" style="justify-content:center;text-align:center;flex-direction:column;align-items:center;">
+  <div class="seigaiha" style="top:10px;left:-6px;width:300px;height:170px;opacity:.16;-webkit-mask:radial-gradient(130% 130% at 0 0,#000,transparent 70%);mask:radial-gradient(130% 130% at 0 0,#000,transparent 70%);"></div>
+  <div class="seigaiha" style="top:10px;right:-6px;width:300px;height:170px;opacity:.16;transform:scaleX(-1);-webkit-mask:radial-gradient(130% 130% at 0 0,#000,transparent 70%);mask:radial-gradient(130% 130% at 0 0,#000,transparent 70%);"></div>
+  <div class="section-head" style="justify-content:center;text-align:center;flex-direction:column;align-items:center;position:relative;z-index:2;">
     <span class="eyebrow">Membership</span>
     <h2 style="font-family:var(--serif);font-size:clamp(24px,3.4vw,34px);font-weight:600;letter-spacing:.06em;margin-top:14px;">あなたの旅の、たのしみ方で。</h2>
     <p style="color:var(--kinari-mute);font-size:13.5px;margin-top:8px;max-width:46ch;">すべての名湯を旅するか、お気に入りの一人を追いかけるか。いつでも変更・解約いただけます。</p>
@@ -762,8 +885,10 @@
 <!-- ============ JOIN ============ -->
 <section class="join">
   <div class="join-bg"></div>
+  <div class="mountains" style="opacity:.4"></div>
   <div class="wrap">
-    <h2>癒しと憧れが交差する、<br>温泉旅チャンネルへ。</h2>
+    <div class="divider" style="margin-bottom:30px"><span class="mon"></span></div>
+    <h2 class="goldgrad">癒しと憧れが交差する、<br>温泉旅チャンネルへ。</h2>
     <p>湯けむりの先にある、まだ知らない物語を。今夜、その一湯目を。</p>
     <div class="hero-cta">
       <a href="#" class="btn btn-line">無料サンプルを見る</a>
@@ -834,6 +959,46 @@
       });
     });
   });
+
+  // === ファーストビュー：菱形タイル モザイク生成 ===
+  (function buildMosaic(){
+    const mosaic = document.getElementById('mosaic');
+    if(!mosaic) return;
+    const imgs = ['top1','top2','top3','down4','down6','down7','down12','down13','down14','down17','down18','down19']
+      .map(n => 'img/' + n + '.jpg');
+    function layout(){
+      mosaic.querySelectorAll('.dtile').forEach(el => el.remove());
+      const W = mosaic.clientWidth, H = mosaic.clientHeight;
+      if(!W || !H) return;
+      const t  = Math.max(104, Math.min(W, H) * 0.30); // タイル一辺
+      const fx = W * 0.62, fy = H * 0.44;              // フェードインの起点
+      let idx = 0;
+      const cols = Math.ceil(W / t) + 1, rows = Math.ceil(H / t) + 1;
+      const place = (x, y) => {
+        if(x > W || y > H || x + t < 0 || y + t < 0) return;
+        const tile = document.createElement('div');
+        tile.className = 'dtile';
+        tile.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + t + 'px;height:' + t + 'px';
+        const img = document.createElement('img');
+        img.src = imgs[(idx * 5 + ((y / t) | 0) * 3) % imgs.length];
+        img.alt = ''; img.loading = 'lazy';
+        tile.appendChild(img);
+        const d = Math.hypot(x + t/2 - fx, y + t/2 - fy);
+        tile.style.animationDelay = Math.min(d / 620, 1.1) + 's';
+        mosaic.appendChild(tile);
+        idx++;
+      };
+      for(let r = -1; r < rows; r++){
+        for(let c = -1; c < cols; c++){
+          place(c * t, r * t);                 // 主グリッド
+          place(c * t + t/2, r * t + t/2);     // 半オフセットで隙間を埋める
+        }
+      }
+    }
+    layout();
+    let rt;
+    window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layout, 200); });
+  })();
 
   // ランキングのタブ切り替え
   const tabs = document.querySelectorAll('.rank-tab');
