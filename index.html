@@ -290,13 +290,13 @@
   }
   .thumb .scene{ position:absolute; inset:0; }
   /* 実写を和の色調へ寄せて配置 */
-  .m-photo img, .rk-thumb img{
+  .m-photo img, .rk-thumb img, .thumb img, .feat > img{
     position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 24%;
     filter:saturate(.78) contrast(1.04) brightness(.9) sepia(.1);
     transition:transform 1.2s var(--ease), filter .6s var(--ease);
   }
-  .model:hover .m-photo img, .rank-item:hover .rk-thumb img{ transform:scale(1.05); filter:saturate(.95) brightness(.98); }
-  .m-photo .scene + img{ display:block; }
+  .model:hover .m-photo img, .rank-item:hover .rk-thumb img,
+  .card:hover .thumb img, .feat:hover > img{ transform:scale(1.06); filter:saturate(.95) brightness(.98); }
   .thumb::after{ /* シネマ調の暗部 */
     content:""; position:absolute; inset:0;
     background:linear-gradient(180deg,transparent 38%,rgba(8,6,5,.86) 100%);
@@ -1002,6 +1002,44 @@
     layout();
     let rt;
     window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layout, 200); });
+  })();
+
+  // === 空き枠（作品カード・ランキング・特集）に手持ち写真を仮配置 ===
+  (function fillScenes(){
+    // 作品タイトル → 写真（1作品=1枚で統一。同じ作品はどこでも同じ写真）
+    const workImg = {
+      '霧氷の宿、雪見の露天':'down6',
+      '木漏れ日の渓谷宿にて':'down7',
+      '瀬戸の島、夕凪の湯宿':'down12',
+      '灯ともし頃の温泉街':'down14',
+      '朝霧の立つ、山あいの宿':'down17',
+      '紅葉に染まる秘湯の宿':'down18',
+      '湯上がりの縁側、午後の光':'down19',
+      '潮騒を聴く、岬の露天':'down4',
+      '提灯あかりの路地裏散歩':'top1',
+      '朝市と、湯の街の目覚め':'down13',
+      '雨上がり、苔むす庭園湯':'top2',
+      '星明かりの貸切露天':'top3'
+    };
+    const featImg = {
+      '絶景露天風呂特集':'down17',
+      '秘湯めぐり特集':'down6',
+      '初めての方へ':'top2',
+      '人気モデル出演回':'top3',
+      '梅雨にひたる、雨の湯':'down19'
+    };
+    document.querySelectorAll('.thumb .scene, .rk-thumb .scene, .feat .scene').forEach(scene => {
+      const box = scene.closest('.card, .rank-item, .feat');
+      if(!box) return;
+      const titleEl = box.querySelector('.info h3, .rk-title, .feat-body h3');
+      const title = titleEl ? titleEl.textContent.trim() : '';
+      const name = workImg[title] || featImg[title];
+      if(!name) return;
+      const img = document.createElement('img');
+      img.src = 'img/' + name + '.jpg';
+      img.alt = ''; img.loading = 'lazy';
+      scene.replaceWith(img);
+    });
   })();
 
   // ランキングのタブ切り替え
